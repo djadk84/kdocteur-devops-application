@@ -2,22 +2,25 @@ version: '3'
 services:
   pgsql:
     image: postgres:9.4-alpine
+    container_name: pgsql
     environment:
       POSTGRES_PASSWORD: adminsweatworkspassword
       POSTGRES_HOST_AUTH_METHOD: md5
     ports:
-      - "5432:5432" 
+      - "5432:5432"
     volumes:
       - "./pgdata:/var/lib/postgresql/data"
       - "./pgsql:/docker-entrypoint-initdb.d"
     networks:
       - net
   nodeapp00:
-    build: ./nodejs 
+    build: ./nodejs
+    image: sweatworks_nodeapp00
+    container_name: nodeapp00
     #command: sh -c "npm run migrate-up"
     restart: always
     ports:
-      - "3081:3081" 
+      - "3081:3081"
     environment:
       DEVOPS_TEST_BACKEND_AWS_REGION: us-west-1
       DEVOPS_TEST_PORT: 3081
@@ -27,9 +30,10 @@ services:
       - net
   nodeapp01:
     image: sweatworks_nodeapp00
+    container_name: nodeapp01
     restart: always
     ports:
-      - "3082:3082" 
+      - "3082:3082"
     environment:
       DEVOPS_TEST_BACKEND_AWS_REGION: us-west-1
       DEVOPS_TEST_PORT: 3082
@@ -39,9 +43,10 @@ services:
       - net
   nodeapp02:
     image: sweatworks_nodeapp00
+    container_name: nodeapp02
     restart: always
     ports:
-      - "3083:3083" 
+      - "3083:3083"
     environment:
       DEVOPS_TEST_BACKEND_AWS_REGION: us-west-1
       DEVOPS_TEST_PORT: 3083
@@ -50,10 +55,12 @@ services:
     networks:
       - net
   applb:
-    image: haproxy 
+    image: haproxy
+    container_name: applb
+    restart: always
     ports:
-      - "80:80" 
-      - "8080:8080" 
+      - "80:80"
+      - "8080:8080"
     volumes:
       - "./haproxy:/usr/local/etc/haproxy"
     networks:
